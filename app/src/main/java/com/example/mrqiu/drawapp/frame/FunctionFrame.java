@@ -1,9 +1,12 @@
 package com.example.mrqiu.drawapp.frame;
 
+import android.annotation.TargetApi;
 import android.app.Fragment;
+import android.os.Build;
 import android.os.Bundle;
 import android.service.carrier.CarrierService;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +24,7 @@ public class FunctionFrame extends Fragment {
     private OnFunctionClickListener mOnFunctionClickListener;
 
     private Button btnPen, btnEraser, btnColor, btnColorPen,
-            btnSave,btnPenWidth, btnEraserWidth,btnSrcImage;
+            btnSave, btnPenWidth, btnEraserWidth, btnSrcImage;
 
 
     public static FunctionFrame newInstance(OnFunctionClickListener l) {
@@ -67,6 +70,7 @@ public class FunctionFrame extends Fragment {
         btnPenWidth.setOnClickListener(listener);
         btnPen.setOnClickListener(listener);
 
+
     }
 
     private View.OnClickListener listener = new View.OnClickListener() {
@@ -100,4 +104,17 @@ public class FunctionFrame extends Fragment {
             }
         }
     };
+
+    public void setBtnColorPen(int color) {
+        btnColorPen.setBackgroundColor(color);
+    }
+
+    public void setBtnPen(int color) {
+        btnPen.setBackgroundColor(color);
+
+    }
+
+    public void setBtnEraser(int color) {
+        btnEraser.setBackgroundColor(color);
+    }
 }

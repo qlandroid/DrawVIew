@@ -70,7 +70,6 @@ public class ZoomDrawView extends View implements ViewTreeObserver.OnGlobalLayou
     private int mPenColor = Color.BLACK;
 
 
-
     public ZoomDrawView(Context context) {
         super(context);
         init(context, null, 0);
@@ -96,7 +95,7 @@ public class ZoomDrawView extends View implements ViewTreeObserver.OnGlobalLayou
         UIWidth = getResources().getDisplayMetrics().widthPixels;
         UIHeight = getResources().getDisplayMetrics().heightPixels;
         int width = UIWidth;
-        if (UIHeight > UIWidth){
+        if (UIHeight > UIWidth) {
             width = UIHeight;
         }
         mPenBitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
@@ -113,7 +112,7 @@ public class ZoomDrawView extends View implements ViewTreeObserver.OnGlobalLayou
 
     }
 
-    private void initColorPen(){
+    private void initColorPen() {
         mColorPenPaint = new Paint();
         mColorPenPaint.setAntiAlias(true);
         mColorPenPaint.setStrokeWidth(mPenWidth);
@@ -148,6 +147,8 @@ public class ZoomDrawView extends View implements ViewTreeObserver.OnGlobalLayou
 
     }
 
+    private float mLastMoveX, mLastMoveY;
+
     @Override
     public boolean onTouch(View v, MotionEvent event) {
 
@@ -155,13 +156,31 @@ public class ZoomDrawView extends View implements ViewTreeObserver.OnGlobalLayou
 
         int pointerCount = event.getPointerCount();
 
+        if (pointerCount > 1) {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_MOVE:
+                    float mx = event.getX();
+                    float my = event.getY();
+                    float dx = mx - mLastMoveX;
+                    float dy = my - mLastMoveY;
+                    if (Math.abs(dx) > 6 || Math.abs(dy) > 6) {
 
-        if (pointerCount <= 1)
+                        mScaleDrawMatrix.postTranslate(dx, dy);
+                        mScaleSrcBtpMatrix.postTranslate(dx, dy);
+                        checkBorderAndCenterWhenScale();
+                        mLastMoveX = mx;
+                        mLastMoveY = my;
+                    }
+                    break;
+            }
+        } else if (pointerCount <= 1)
             switch (event.getAction()) {
                 case MotionEvent.ACTION_MOVE:
                     touchMove(event);
                     break;
                 case MotionEvent.ACTION_DOWN:
+                    mLastMoveX = event.getX();
+                    mLastMoveY = event.getY();
                     touchDown(event);
                     break;
                 case MotionEvent.ACTION_UP:
@@ -271,7 +290,7 @@ public class ZoomDrawView extends View implements ViewTreeObserver.OnGlobalLayou
         float scale = getScale();
         float scaleFactor = detector.getScaleFactor();
 
-        if (mBgBitmap == null)
+        if (mSrcBitmap == null)
             return true;
 
         /**
@@ -357,7 +376,7 @@ public class ZoomDrawView extends View implements ViewTreeObserver.OnGlobalLayou
     private RectF getMatrixRectF() {
         Matrix matrix = mScaleDrawMatrix;
         RectF rect = new RectF();
-        Bitmap d = mBgBitmap;
+        Bitmap d = mPenBitmap;
         if (null != d) {
             rect.set(0, 0, d.getWidth(), d.getHeight());
             matrix.mapRect(rect);
@@ -380,8 +399,8 @@ public class ZoomDrawView extends View implements ViewTreeObserver.OnGlobalLayou
         int width = getWidth();
         int height = getHeight();
         // 拿到图片的宽和高
-        int dw = (int) (mSrcBitmap.getWidth()*getScale());
-        int dh = (int) (mSrcBitmap.getHeight()*getScale());
+        int dw = (int) (mSrcBitmap.getWidth() * getScale());
+        int dh = (int) (mSrcBitmap.getHeight() * getScale());
         float scale = 1.0f;
         // 如果图片的宽或者高大于屏幕，则缩放至屏幕的宽或者高
         if (dw > width && dh <= height) {
@@ -432,8 +451,8 @@ public class ZoomDrawView extends View implements ViewTreeObserver.OnGlobalLayou
 
     }
 
-    public void setPenColor(int alpha, int red, int green, int blue){
-        int color = Color.argb(alpha,red,green,blue);
+    public void setPenColor(int alpha, int red, int green, int blue) {
+        int color = Color.argb(alpha, red, green, blue);
         this.mPenColor = color;
         mPenPaint.setColor(mPenColor);
     }
@@ -462,8 +481,8 @@ public class ZoomDrawView extends View implements ViewTreeObserver.OnGlobalLayou
         //Matrix matrix = new Matrix();
         //outSrcBitmap(mSrcBitmap,matrix);
         float scale = getScale();
-        mScaleDrawMatrix.postScale(1/scale,1/scale,getWidth()/2,getHeight()/2);
-        mScaleSrcBtpMatrix.postScale(1/scale,1/scale,getWidth()/2,getHeight()/2);
+        mScaleDrawMatrix.postScale(1 / scale, 1 / scale, getWidth() / 2, getHeight() / 2);
+        mScaleSrcBtpMatrix.postScale(1 / scale, 1 / scale, getWidth() / 2, getHeight() / 2);
         checkBorderAndCenterWhenScale();
 
         outCanvas.drawBitmap(mSrcBitmap, mScaleSrcBtpMatrix, null);
@@ -489,8 +508,7 @@ public class ZoomDrawView extends View implements ViewTreeObserver.OnGlobalLayou
     }
 
 
-
-    public void setMode(int mode){
+    public void setMode(int mode) {
         mMode = mode;
     }
 

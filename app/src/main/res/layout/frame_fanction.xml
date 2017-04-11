@@ -2,7 +2,6 @@
 <HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#d1b5b5"
     android:orientation="horizontal">
 
     <LinearLayout
@@ -12,18 +11,28 @@
 
 
         <Button
+            android:layout_width="50dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="4dp"
+            android:background="@color/colorRed"
             android:id="@+id/btn_pen"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:text="画笔" />
 
         <Button
+            android:layout_width="50dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="4dp"
+            android:background="@color/colorGray"
             android:id="@+id/btn_eraser"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:text="橡皮擦" />
+
+        <Button
+            android:background="@color/colorGray"
+            android:id="@+id/btn_colorPen"
+            android:layout_width="50dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="4dp"
+            android:text="水彩笔" />
 
         <Button
             android:id="@+id/btn_color"
@@ -32,12 +41,7 @@
             android:layout_weight="1"
             android:text="color" />
 
-        <Button
-            android:id="@+id/btn_colorPen"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="水彩笔" />
+
 
         <Button
             android:id="@+id/btn_penWidth"

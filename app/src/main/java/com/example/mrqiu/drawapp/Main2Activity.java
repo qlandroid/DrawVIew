@@ -9,12 +9,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -31,7 +33,11 @@ import com.example.mrqiu.drawapp.widget.ZoomDrawView;
 public class Main2Activity extends AppCompatActivity {
     private static final int MODE_PEN = 0x1;
     private static final int MODE_COLOR_PEN = 0x12;
+    private static final int MODE_ERASER = 0x123;
     private static final int CHOOSE_PHOTO = 0x132;
+
+    private static final int SELECT_COLOR = Color.RED;
+    private static  int NORMAL_COLOR;
 
     private ZoomDrawView zdv;
     private FragmentManager mFragmentManager;
@@ -46,6 +52,7 @@ public class Main2Activity extends AppCompatActivity {
     private int blue;
 
     private int mMode;
+    private int type;
 
 
     @Override
@@ -56,16 +63,22 @@ public class Main2Activity extends AppCompatActivity {
         zdv = (ZoomDrawView) findViewById(R.id.zdv);
         mFragmentManager = getFragmentManager();
 
+        NORMAL_COLOR = getResources().getColor(R.color.colorGray);
+
         mFunctionFrame = FunctionFrame.newInstance(new OnFunctionClickListener() {
             @Override
             public void clickPen() {
                 mMode = MODE_PEN;
+                type =MODE_PEN;
+                updateBtnColor();
                 zdv.setPenColor(255, red, green, blue);
                 zdv.setMode(ZoomDrawView.MODE_PEN);
             }
 
             @Override
             public void clickEraser() {
+                type = MODE_ERASER;
+                updateBtnColor();
                 zdv.setMode(ZoomDrawView.MODE_ERASER);
             }
 
@@ -77,6 +90,8 @@ public class Main2Activity extends AppCompatActivity {
             @Override
             public void clickColorPen() {
                 mMode = MODE_COLOR_PEN;
+                type = MODE_COLOR_PEN;
+                updateBtnColor();
                 zdv.setMode(ZoomDrawView.MODE_PEN);
                 zdv.setPenColor(125, red, green, blue);
 
@@ -98,16 +113,16 @@ public class Main2Activity extends AppCompatActivity {
                 Bitmap bitmap = zdv.outBitmap();
                 String savePath = PhotoUtil.saveToLocal(bitmap);
                 Toast.makeText(Main2Activity.this, savePath, Toast.LENGTH_SHORT).show();
-                sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,Uri.parse("file://"+savePath)));
+                sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + savePath)));
 
 
             }
 
             @Override
             public void clickSrcImage() {
-                if(ContextCompat.checkSelfPermission(Main2Activity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
-                    ActivityCompat.requestPermissions(Main2Activity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
-                }else {
+                if (ContextCompat.checkSelfPermission(Main2Activity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(Main2Activity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                } else {
                     openAlbum();
                 }
 
@@ -248,6 +263,24 @@ public class Main2Activity extends AppCompatActivity {
 
     private void displayImage(String imagePath) {
         zdv.setSrcImage(imagePath);
+    }
+
+
+    private void updateBtnColor() {
+        if (type == MODE_COLOR_PEN) {
+            mFunctionFrame.setBtnColorPen(SELECT_COLOR);
+            mFunctionFrame.setBtnEraser(NORMAL_COLOR);
+            mFunctionFrame.setBtnPen(NORMAL_COLOR);
+
+        } else if (type == MODE_PEN) {
+            mFunctionFrame.setBtnColorPen(NORMAL_COLOR);
+            mFunctionFrame.setBtnEraser(NORMAL_COLOR);
+            mFunctionFrame.setBtnPen(SELECT_COLOR);
+        } else if (type == MODE_ERASER) {
+            mFunctionFrame.setBtnColorPen(NORMAL_COLOR);
+            mFunctionFrame.setBtnEraser(SELECT_COLOR);
+            mFunctionFrame.setBtnPen(NORMAL_COLOR);
+        }
     }
 
 
